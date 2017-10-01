@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import shallowCompare from 'react-addons-shallow-compare';
-import blockManager from '../Block/blockManager';
+// import blockManager from '../Block/blockManager';
 
 function getHeight(elem) {
   return elem.clientHeight;
@@ -10,11 +11,11 @@ function getHeight(elem) {
 class ScrollingTechniques extends Component {
 
   static propTypes = {
-    children: React.PropTypes.element.isRequired,
+    children: PropTypes.element.isRequired,
   };
 
   constructor() {
-    super();
+    super(null);
 
     this.state = {
       frames: null,
@@ -22,12 +23,19 @@ class ScrollingTechniques extends Component {
       tabBarHeight: -1,
       toolBarHeight: -1,
     };
+
+    // currentFrame: 0
+    // flexibleSpaceHeight: 200
+    // frames: [200, 200]
+    // tabBarHeight: 48
+    // toolBarHeight: 64
   }
 
   componentDidMount() {
     window.addEventListener('scroll', this.handleScroll);
     const currentFrame = this.getCurrentFrame(window.scrollY);
     this.processFrame(currentFrame);
+    console.log(this.refs.scrolling)
     this.refs.scrolling;
   }
 
@@ -36,6 +44,8 @@ class ScrollingTechniques extends Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
+    // console.log(nextProps);
+    // console.log(nextState);
     this.processFrame(this.getCurrentFrame(window.scrollY, nextState.frames), true);
   }
 
@@ -45,19 +55,21 @@ class ScrollingTechniques extends Component {
 
   handleScroll = (event) => {
     const currentFrame = this.getCurrentFrame(event.target.body.scrollTop);
+    // console.log(currentFrame);
     this.processFrame(currentFrame);
   };
-
+  
   getFixedStyle = () => {
     return this.props.mock ? 'relative' : 'fixed';
   };
-
+  
   processFrame = (currentFrame, force) => {
     if (!force && (this.rqf || currentFrame === null || this.currentFrame === currentFrame)) return;
-
+    
     this.rqf = requestAnimationFrame(() => {
       this.rqf = null;
       this.currentFrame = currentFrame;
+      // console.log(currentFrame);
 
       this.appBar.style.transition = 'none';
       this.appBar.style['padding-top'] = `${this.state.toolBarHeight}px`;
@@ -72,23 +84,28 @@ class ScrollingTechniques extends Component {
       }
 
       if (currentFrame === 0) {
+        console.log(0)
         this.appBar.style.top = '0px';
         this.appBar.style.position = 'relative';
         this.refs.padding.style.height = `0px`;
-
+        
         this.toolBar.style.bottom = null;
       } else if (currentFrame === 1) {
-
+        console.log(1)
+        
         this.appBar.style.top = '0px';
         this.appBar.style.position = 'relative';
-
-        this.refs.padding.style.height = `0px`;
-
+        
+        // this.refs.padding.style.height = `0px`;
+        
         this.toolBar.style.position = 'absolute';
         this.toolBar.style.top = null;
         this.toolBar.style.bottom = `${this.state.tabBarHeight}px`;
-
+        
       } else if (currentFrame === -1) {
+        console.log(-1)
+        // console.log(this.computeFixedOffset(this.state));
+        // console.log(this.refs);
         this.appBar.style.top = `-${(this.computeFixedOffset(this.state))}px`;
         this.appBar.style.position = this.getFixedStyle();
 
@@ -111,7 +128,8 @@ class ScrollingTechniques extends Component {
   };
 
   computeFixedOffset = (state) => {
-    return this.props.fixed ? state.flexibleSpaceHeight : state.flexibleSpaceHeight + state.toolBarHeight + state.tabBarHeight;
+    // return this.props.fixed ? state.flexibleSpaceHeight : state.flexibleSpaceHeight + state.toolBarHeight + state.tabBarHeight;
+    return state.flexibleSpaceHeight + state.toolBarHeight + state.tabBarHeight;
   };
 
   computeFrames = (state) => {
@@ -120,23 +138,28 @@ class ScrollingTechniques extends Component {
   };
 
   registerBlock = (key, elem) => {
-    console.log(elem);
+    // console.log(elem);
     this[key] = ReactDOM.findDOMNode(elem);
+    console.log(key);
 
     if (elem && this.state[`${key}Height`] !== getHeight(elem)) {
      this.setState((previousState) => {
         const nextState = {
           ...previousState,
           [`${key}Height`]: getHeight(elem),
-        };
+        };  
 
         const frames = this.computeFrames(nextState);
 
-        return {
+        const st = {
           ...nextState,
           frames,
           currentFrame: frames ? this.getCurrentFrame(window.scrollY, frames) : null,
         };
+
+        console.log(st);
+
+        return st;
       });
     }
   };

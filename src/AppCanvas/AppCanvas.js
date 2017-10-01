@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import filterUniqueChildren from '../util/filterUniqueChildren';
 
 import AppBar from '../AppBar';
@@ -37,6 +38,10 @@ class AppCanvas extends Component {
       </div>
     );
   }
+}
+
+AppCanvas.propTypes = {
+  scrollingTechniques: PropTypes.bool,
 }
 
 export default AppCanvas;

@@ -22,7 +22,7 @@ const styles = {
 };
 
 const AppBar = (props) => {
-  console.log('AppBar rendered...');
+  // console.log('AppBar rendered...');
 
   const {
     children,
